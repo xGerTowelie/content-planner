@@ -43,12 +43,12 @@ export default function ProjectDisplay({ projectId }: { projectId: string }) {
                                 <ul className="space-y-2">
                                     {steps.map((step) => (
                                         <li key={step.id} className="flex items-center justify-between p-2 bg-white rounded shadow">
-                                            <span className="flex items-center">
+                                            <Link href="/dashboard/projects/1/steps/1" className="flex items-center">
                                                 <CheckCircleIcon className={`mr-2 h-4 w-4 ${step.status === 'completed' ? 'text-green-500' :
                                                     step.status === 'in-progress' ? 'text-blue-500' : 'text-gray-300'
                                                     }`} />
                                                 {step.title}
-                                            </span>
+                                            </Link>
                                             <span className="text-sm text-gray-500 capitalize">{step.status}</span>
                                         </li>
                                     ))}
