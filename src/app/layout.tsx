@@ -20,7 +20,9 @@ export default async function RootLayout({
                 <SessionProvider session={session}>
                     {children}
                 </SessionProvider>
-                <Toaster position="top-right" />
+                <div className="fixed top-0 right-0">
+                    <Toaster />
+                </div>
             </body>
         </html>
     )
