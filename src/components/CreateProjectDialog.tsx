@@ -11,21 +11,51 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
+import { useToast } from "@/hooks/use-toast"
 
 interface CreateProjectDialogProps {
-    onProjectCreated: (projectName: string) => void
+    onProjectCreated: (project: any) => void
 }
 
 export function CreateProjectDialog({ onProjectCreated }: CreateProjectDialogProps) {
     const [projectName, setProjectName] = useState('')
+    const [projectDescription, setProjectDescription] = useState('')
     const [open, setOpen] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
+    const { toast } = useToast()
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        if (projectName.trim()) {
-            onProjectCreated(projectName)
+        setIsLoading(true)
+        try {
+            const response = await fetch('/api/projects', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ name: projectName, description: projectDescription }),
+            })
+            if (!response.ok) {
+                throw new Error('Failed to create project')
+            }
+            const newProject = await response.json()
+            onProjectCreated(newProject)
             setProjectName('')
+            setProjectDescription('')
             setOpen(false)
+            toast({
+                title: "Success",
+                description: "Project created successfully",
+            })
+        } catch (error) {
+            console.error('Error creating project:', error)
+            toast({
+                title: "Error",
+                description: "Failed to create project. Please try again.",
+                variant: "destructive",
+            })
+        } finally {
+            setIsLoading(false)
         }
     }
 
@@ -55,7 +85,7 @@ export function CreateProjectDialog({ onProjectCreated }: CreateProjectDialogPro
                 <DialogHeader>
                     <DialogTitle>Create New Project</DialogTitle>
                     <DialogDescription>
-                        Enter a name for your new project. Click create when you&apos;re done.
+                        Enter a name and description for your new project. Click create when you're done.
                     </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit}>
@@ -72,9 +102,23 @@ export function CreateProjectDialog({ onProjectCreated }: CreateProjectDialogPro
                                 placeholder="My Awesome Project"
                             />
                         </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor="project-description" className="text-right">
+                                Description
+                            </Label>
+                            <Input
+                                id="project-description"
+                                value={projectDescription}
+                                onChange={(e) => setProjectDescription(e.target.value)}
+                                className="col-span-3"
+                                placeholder="A brief description of your project"
+                            />
+                        </div>
                     </div>
                     <DialogFooter>
-                        <Button type="submit">Create Project</Button>
+                        <Button type="submit" disabled={isLoading}>
+                            {isLoading ? 'Creating...' : 'Create Project'}
+                        </Button>
                     </DialogFooter>
                 </form>
             </DialogContent>

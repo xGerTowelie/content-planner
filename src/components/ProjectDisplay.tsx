@@ -1,28 +1,80 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CalendarIcon, CheckCircleIcon, ClockIcon, FileIcon, PlusIcon, UsersIcon } from "lucide-react"
 import Link from 'next/link'
+import { useToast } from "@/hooks/use-toast"
+
+interface Step {
+    id: string
+    title: string
+    description: string | null
+    status: string
+}
+
+interface Project {
+    id: string
+    name: string
+    description: string | null
+    status: string
+    createdAt: string
+    updatedAt: string
+    steps: Step[]
+}
 
 export default function ProjectDisplay({ projectId }: { projectId: string }) {
-    const steps = [
-        { id: 1, title: "Write script", status: "completed" },
-        { id: 2, title: "Create storyboard", status: "in-progress" },
-        { id: 3, title: "Record voiceover", status: "upcoming" },
-        { id: 4, title: "Edit footage", status: "upcoming" },
-        { id: 5, title: "Add special effects", status: "upcoming" },
-    ]
+    const [project, setProject] = useState<Project | null>(null)
+    const [isLoading, setIsLoading] = useState(true)
+    const { toast } = useToast()
+
+    useEffect(() => {
+        fetchProject()
+    }, [projectId])
+
+    const fetchProject = async () => {
+        try {
+            const response = await fetch(`/api/projects/${projectId}`)
+            if (!response.ok) {
+                throw new Error('Failed to fetch project')
+            }
+            const data = await response.json()
+            setProject(data)
+        } catch (error) {
+            console.error('Error fetching project:', error)
+            toast({
+                title: "Error",
+                description: "Failed to load project. Please try again.",
+                variant: "destructive",
+            })
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    if (isLoading) {
+        return <div className="flex justify-center items-center h-64">Loading project...</div>
+    }
+
+    if (!project) {
+        return <div className="text-center text-red-500">Project not found</div>
+    }
+
+    const completedSteps = project.steps.filter(step => step.status === 'completed').length
+    const progress = (completedSteps / project.steps.length) * 100
 
     return (
-        <>
-            <header className="flex justify-between items-center mb-6">
-                <h1 className="text-3xl font-bold">Project {projectId}</h1>
+        <div className="space-y-6">
+            <header className="flex justify-between items-center">
+                <h1 className="text-3xl font-bold">{project.name}</h1>
                 <Link href="/dashboard">
                     <Button variant="outline">Back to Dashboard</Button>
                 </Link>
             </header>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <Card className="md:col-span-2">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle>Project Steps</CardTitle>
@@ -41,11 +93,11 @@ export default function ProjectDisplay({ projectId }: { projectId: string }) {
                             </TabsList>
                             <TabsContent value="all">
                                 <ul className="space-y-2">
-                                    {steps.map((step) => (
+                                    {project.steps.map((step) => (
                                         <li key={step.id} className="flex items-center justify-between p-2 bg-white rounded shadow">
-                                            <Link href="/dashboard/projects/1/steps/1" className="flex items-center">
+                                            <Link href={`/dashboard/projects/${projectId}/steps/${step.id}`} className="flex items-center">
                                                 <CheckCircleIcon className={`mr-2 h-4 w-4 ${step.status === 'completed' ? 'text-green-500' :
-                                                    step.status === 'in-progress' ? 'text-blue-500' : 'text-gray-300'
+                                                        step.status === 'in-progress' ? 'text-blue-500' : 'text-gray-300'
                                                     }`} />
                                                 {step.title}
                                             </Link>
@@ -56,12 +108,12 @@ export default function ProjectDisplay({ projectId }: { projectId: string }) {
                             </TabsContent>
                             <TabsContent value="completed">
                                 <ul className="space-y-2">
-                                    {steps.filter(step => step.status === 'completed').map((step) => (
+                                    {project.steps.filter(step => step.status === 'completed').map((step) => (
                                         <li key={step.id} className="flex items-center justify-between p-2 bg-white rounded shadow">
-                                            <span className="flex items-center">
+                                            <Link href={`/dashboard/projects/${projectId}/steps/${step.id}`} className="flex items-center">
                                                 <CheckCircleIcon className="mr-2 h-4 w-4 text-green-500" />
                                                 {step.title}
-                                            </span>
+                                            </Link>
                                             <span className="text-sm text-gray-500 capitalize">{step.status}</span>
                                         </li>
                                     ))}
@@ -69,12 +121,12 @@ export default function ProjectDisplay({ projectId }: { projectId: string }) {
                             </TabsContent>
                             <TabsContent value="in-progress">
                                 <ul className="space-y-2">
-                                    {steps.filter(step => step.status === 'in-progress').map((step) => (
+                                    {project.steps.filter(step => step.status === 'in-progress').map((step) => (
                                         <li key={step.id} className="flex items-center justify-between p-2 bg-white rounded shadow">
-                                            <span className="flex items-center">
+                                            <Link href={`/dashboard/projects/${projectId}/steps/${step.id}`} className="flex items-center">
                                                 <ClockIcon className="mr-2 h-4 w-4 text-blue-500" />
                                                 {step.title}
-                                            </span>
+                                            </Link>
                                             <span className="text-sm text-gray-500 capitalize">{step.status}</span>
                                         </li>
                                     ))}
@@ -82,12 +134,12 @@ export default function ProjectDisplay({ projectId }: { projectId: string }) {
                             </TabsContent>
                             <TabsContent value="upcoming">
                                 <ul className="space-y-2">
-                                    {steps.filter(step => step.status === 'upcoming').map((step) => (
+                                    {project.steps.filter(step => step.status === 'upcoming').map((step) => (
                                         <li key={step.id} className="flex items-center justify-between p-2 bg-white rounded shadow">
-                                            <span className="flex items-center">
-                                                <CheckCircleIcon className="mr-2 h-4 w-4 text-gray-300" />
+                                            <Link href={`/dashboard/projects/${projectId}/steps/${step.id}`} className="flex items-center">
+                                                <CalendarIcon className="mr-2 h-4 w-4 text-gray-300" />
                                                 {step.title}
-                                            </span>
+                                            </Link>
                                             <span className="text-sm text-gray-500 capitalize">{step.status}</span>
                                         </li>
                                     ))}
@@ -102,8 +154,8 @@ export default function ProjectDisplay({ projectId }: { projectId: string }) {
                             <CardTitle>Project Progress</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <Progress value={30} className="w-full mb-2" />
-                            <p className="text-center">30% Complete</p>
+                            <Progress value={progress} className="w-full mb-2" />
+                            <p className="text-center">{progress.toFixed(0)}% Complete</p>
                         </CardContent>
                     </Card>
                     <Card>
@@ -114,51 +166,67 @@ export default function ProjectDisplay({ projectId }: { projectId: string }) {
                             <div className="space-y-2">
                                 <div className="flex justify-between items-center">
                                     <span className="flex items-center">
-                                        <CheckCircleIcon className="mr-2 h-4 w-4" />
+                                        <CheckCircleIcon className="mr-2 h-4 w-4 text-green-500" />
                                         Completed Steps
                                     </span>
-                                    <span>1 / 5</span>
+                                    <span>{completedSteps} / {project.steps.length}</span>
                                 </div>
                                 <div className="flex justify-between items-center">
                                     <span className="flex items-center">
-                                        <UsersIcon className="mr-2 h-4 w-4" />
-                                        Team Members
+                                        <ClockIcon className="mr-2 h-4 w-4 text-blue-500" />
+                                        In Progress
                                     </span>
-                                    <span>7</span>
+                                    <span>{project.steps.filter(step => step.status === 'in-progress').length}</span>
                                 </div>
                                 <div className="flex justify-between items-center">
                                     <span className="flex items-center">
-                                        <CalendarIcon className="mr-2 h-4 w-4" />
-                                        Due Date
+                                        <CalendarIcon className="mr-2 h-4 w-4 text-gray-500" />
+                                        Upcoming
                                     </span>
-                                    <span>Aug 15, 2023</span>
+                                    <span>{project.steps.filter(step => step.status === 'upcoming').length}</span>
                                 </div>
                             </div>
                         </CardContent>
                     </Card>
                     <Card>
                         <CardHeader>
-                            <CardTitle>Recent Activity</CardTitle>
+                            <CardTitle>Project Details</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <ul className="space-y-2">
-                                <li className="flex items-center">
-                                    <ClockIcon className="mr-2 h-4 w-4" />
-                                    <span>Step &quot;Create storyboard&quot; started 2h ago</span>
-                                </li>
-                                <li className="flex items-center">
-                                    <CheckCircleIcon className="mr-2 h-4 w-4" />
-                                    <span>Step &quot;Write script&quot; completed yesterday</span>
-                                </li>
-                                <li className="flex items-center">
-                                    <UsersIcon className="mr-2 h-4 w-4" />
-                                    <span>New team member added 3 days ago</span>
-                                </li>
-                            </ul>
+                            <div className="space-y-2">
+                                <div className="flex justify-between items-center">
+                                    <span className="flex items-center">
+                                        <FileIcon className="mr-2 h-4 w-4" />
+                                        Description
+                                    </span>
+                                </div>
+                                <p className="text-sm text-gray-600">{project.description || 'No description provided'}</p>
+                                <div className="flex justify-between items-center">
+                                    <span className="flex items-center">
+                                        <CalendarIcon className="mr-2 h-4 w-4" />
+                                        Created
+                                    </span>
+                                    <span className="text-sm text-gray-500">{new Date(project.createdAt).toLocaleDateString()}</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="flex items-center">
+                                        <ClockIcon className="mr-2 h-4 w-4" />
+                                        Last Updated
+                                    </span>
+                                    <span className="text-sm text-gray-500">{new Date(project.updatedAt).toLocaleDateString()}</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="flex items-center">
+                                        <UsersIcon className="mr-2 h-4 w-4" />
+                                        Status
+                                    </span>
+                                    <span className="text-sm font-medium text-green-600 capitalize">{project.status}</span>
+                                </div>
+                            </div>
                         </CardContent>
                     </Card>
                 </div>
             </div>
-        </>
+        </div>
     )
 }

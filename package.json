@@ -7,6 +7,7 @@
     "start": "next start",
     "lint": "next lint",
     "dev": "next dev",
+    "dev:seed": "dotenv -e .env.local -- ts-node --project tsconfig.seed.json prisma/seed.ts",
     "dev:docker": "docker compose --env-file .env.local up",
     "dev:db": "dotenv -e .env.local -- npx prisma studio",
     "dev:sync": "dotenv -e .env.local -- npx prisma db push && npx prisma generate"
@@ -46,6 +47,7 @@
     "postcss": "^8",
     "prisma": "^5.20.0",
     "tailwindcss": "^3.4.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
   }
 }
