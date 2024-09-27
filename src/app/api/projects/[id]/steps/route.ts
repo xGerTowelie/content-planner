@@ -3,31 +3,7 @@ import { getServerSession } from "next-auth/next"
 import { prisma } from '@/lib/prisma'
 import { authOptions } from '@/lib/auth'
 
-export async function GET(request: Request, { params }: { params: { projectId: string } }) {
-    const session = await getServerSession(authOptions)
-
-    if (!session) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    try {
-        const project = await prisma.project.findUnique({
-            where: { id: params.projectId },
-            include: { steps: true },
-        })
-
-        if (!project || project.userId !== session.user.id) {
-            return NextResponse.json({ error: 'Project not found' }, { status: 404 })
-        }
-
-        return NextResponse.json(project.steps)
-    } catch (error) {
-        console.error('Error fetching steps:', error)
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
-    }
-}
-
-export async function POST(request: Request, { params }: { params: { projectId: string } }) {
+export async function POST(request: Request, { params }: { params: { id: string } }) {
     const session = await getServerSession(authOptions)
 
     if (!session) {
@@ -38,7 +14,7 @@ export async function POST(request: Request, { params }: { params: { projectId: 
         const { title, description, status } = await request.json()
 
         const project = await prisma.project.findUnique({
-            where: { id: params.projectId },
+            where: { id: params.id },
         })
 
         if (!project || project.userId !== session.user.id) {
@@ -50,7 +26,7 @@ export async function POST(request: Request, { params }: { params: { projectId: 
                 title,
                 description,
                 status,
-                projectId: params.projectId,
+                projectId: params.id,
             },
         })
 
