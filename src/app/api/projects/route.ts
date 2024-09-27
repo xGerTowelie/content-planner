@@ -1,11 +1,9 @@
 import { NextResponse } from 'next/server'
 import { getServerSession } from "next-auth/next"
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
 import { authOptions } from '@/lib/auth'
 
-const prisma = new PrismaClient()
-
-export async function GET() {
+export async function GET(request: Request) {
     const session = await getServerSession(authOptions)
 
     if (!session) {
@@ -22,8 +20,6 @@ export async function GET() {
     } catch (error) {
         console.error('Error fetching projects:', error)
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
-    } finally {
-        await prisma.$disconnect()
     }
 }
 
@@ -34,13 +30,13 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { name, description } = await request.json()
-
-    if (!name) {
-        return NextResponse.json({ error: 'Project name is required' }, { status: 400 })
-    }
-
     try {
+        const { name, description } = await request.json()
+
+        if (!name) {
+            return NextResponse.json({ error: 'Project name is required' }, { status: 400 })
+        }
+
         const newProject = await prisma.project.create({
             data: {
                 name,
@@ -53,7 +49,5 @@ export async function POST(request: Request) {
     } catch (error) {
         console.error('Error creating project:', error)
         return NextResponse.json({ error: 'Failed to create project' }, { status: 500 })
-    } finally {
-        await prisma.$disconnect()
     }
 }
