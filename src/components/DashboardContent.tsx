@@ -150,7 +150,7 @@ export default function DashboardContent() {
                                                         </Button>
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="end">
-                                                        <DropdownMenuItem onSelect={() => setDeleteProjectId(project.id)}>
+                                                        <DropdownMenuItem onClick={e => e.stopPropagation()} onSelect={() => setDeleteProjectId(project.id)}>
                                                             Delete
                                                         </DropdownMenuItem>
                                                     </DropdownMenuContent>

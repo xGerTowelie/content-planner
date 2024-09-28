@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 
 const TOAST_LIMIT = 3
-const TOAST_REMOVE_DELAY = 1000000
+const TOAST_REMOVE_DELAY = 2000
 
 type ToastProps = {
     id: string
