@@ -4,7 +4,7 @@ import { redirect } from "next/navigation"
 import { authOptions } from "@/lib/auth"
 import StepsDisplay from "@/components/StepsDisplay"
 
-export default async function StepsPage({ params }: { params: { stepId: string } }) {
+export default async function StepsPage({ params }: { params: { projectId: string, stepId: string } }) {
     const session = await getServerSession(authOptions)
 
     if (!session) {
