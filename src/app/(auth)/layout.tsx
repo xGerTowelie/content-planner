@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Sidebar from "@/components/Sidebar"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Menu } from "lucide-react"
@@ -40,11 +40,9 @@ export default function AuthLayout({
                 </div>
 
                 {/* Main content */}
-                <main className="flex-1 p-6 overflow-auto">
+                <main className="flex-1 p-6 overflow-hidden">
                     <Card className="h-full">
-                        <CardContent className="p-6">
-                            {children}
-                        </CardContent>
+                        {children}
                     </Card>
                 </main>
             </div>
