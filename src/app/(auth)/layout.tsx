@@ -1,9 +1,7 @@
-'use client'
-
 import Sidebar from "@/components/Sidebar"
 import { Card, CardContent } from "@/components/ui/card"
 
-export default function AuthLayout({
+export default async function AuthLayout({
     children,
 }: {
     children: React.ReactNode

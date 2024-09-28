@@ -11,12 +11,14 @@ import { ArrowLeft, Video, Mic, FileText, Link as LinkIcon, Plus, Trash2, Copy }
 import Link from "next/link"
 import { toast } from "@/hooks/use-toast"
 
-export default function StepsDisplay() {
+export default function StepsDisplay({ stepId }: { stepId: string }) {
     const [stepName, setStepName] = useState("Write Script")
     const [status, setStatus] = useState("draft")
     const [resources, setResources] = useState<{ name: string; url: string }[]>([])
     const [newResourceName, setNewResourceName] = useState("")
     const [newResourceUrl, setNewResourceUrl] = useState("")
+
+    console.log('view steps for id:', stepId)
 
     const addResource = () => {
         if (newResourceName && newResourceUrl) {
