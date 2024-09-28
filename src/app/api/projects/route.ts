@@ -6,6 +6,8 @@ import { authOptions } from '@/lib/auth'
 export async function GET(request: Request) {
     const session = await getServerSession(authOptions)
 
+    console.log('server session:', session)
+
     if (!session) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
