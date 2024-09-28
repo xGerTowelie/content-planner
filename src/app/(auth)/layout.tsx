@@ -41,7 +41,10 @@ export default function AuthLayout({
 
                 {/* Main content */}
                 <main className="flex-1 p-6 overflow-hidden">
-                    <Card className="h-full">
+                    <div className="h-full lg:hidden">
+                        {children}
+                    </div>
+                    <Card className="hidden lg:block h-full">
                         {children}
                     </Card>
                 </main>
