@@ -5,9 +5,9 @@ import SignOutButton from './SignOutButton'
 
 export default function Sidebar() {
     return (
-        <aside className="w-64 bg-white p-6 shadow-md h-screen">
-            <h1 className="text-2xl font-bold mb-8">VidManager</h1>
-            <nav>
+        <aside className="w-64 bg-white p-6 h-full flex flex-col">
+            <h1 className="text-2xl font-bold mb-8 lg:block hidden">VidManager</h1>
+            <nav className="flex-1">
                 {[
                     { icon: HomeIcon, label: "Dashboard", href: "/dashboard" },
                     { icon: FolderIcon, label: "Projects", href: "/dashboard" },
