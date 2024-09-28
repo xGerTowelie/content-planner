@@ -12,9 +12,10 @@ import {
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
+import { Project } from '@prisma/client'
 
 interface CreateProjectDialogProps {
-    onProjectCreated: (project: any) => void
+    onProjectCreated: (project: Project) => void
 }
 
 export function CreateProjectDialog({ onProjectCreated }: CreateProjectDialogProps) {
@@ -85,7 +86,7 @@ export function CreateProjectDialog({ onProjectCreated }: CreateProjectDialogPro
                 <DialogHeader>
                     <DialogTitle>Create New Project</DialogTitle>
                     <DialogDescription>
-                        Enter a name and description for your new project. Click create when you're done.
+                        Enter a name and description for your new project. Click create when you{"'"}re done.
                     </DialogDescription>
                 </DialogHeader>
                 <form onSubmit={handleSubmit}>

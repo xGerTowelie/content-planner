@@ -3,14 +3,13 @@ import { getServerSession } from "next-auth/next"
 import { prisma } from '@/lib/prisma'
 import { authOptions } from '@/lib/auth'
 
-export async function GET(request: Request) {
+export async function GET() {
     const session = await getServerSession(authOptions)
-
-    console.log('server session:', session)
 
     if (!session) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+
 
     try {
         const projects = await prisma.project.findMany({

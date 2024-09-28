@@ -8,14 +8,16 @@ type ToastProps = {
     title?: string
     description?: string
     action?: React.ReactNode
+    open?: boolean
+    onOpenChange?: (open: boolean) => void
 }
 
-const actionTypes = {
-    ADD_TOAST: "ADD_TOAST",
-    UPDATE_TOAST: "UPDATE_TOAST",
-    DISMISS_TOAST: "DISMISS_TOAST",
+type ActionType = {
+    ADD_TOAST: "ADD_TOAST"
+    UPDATE_TOAST: "UPDATE_TOAST"
+    DISMISS_TOAST: "DISMISS_TOAST"
     REMOVE_TOAST: "REMOVE_TOAST"
-} as const
+}
 
 let count = 0
 
@@ -24,7 +26,6 @@ function genId() {
     return count.toString()
 }
 
-type ActionType = typeof actionTypes
 
 type Action =
     | {
@@ -130,7 +131,8 @@ function dispatch(action: Action) {
     })
 }
 
-type Toast = Omit<ToastProps, "id">
+type ToastPropsWithVariant = ToastProps & { variant?: string }
+type Toast = Omit<ToastPropsWithVariant, "id">
 
 function toast({ ...props }: Toast) {
     const id = genId()
@@ -148,7 +150,7 @@ function toast({ ...props }: Toast) {
             ...props,
             id,
             open: true,
-            onOpenChange: (open) => {
+            onOpenChange: (open: boolean) => {
                 if (!open) dismiss()
             },
         },

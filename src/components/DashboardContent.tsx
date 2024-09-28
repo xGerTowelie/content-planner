@@ -2,21 +2,12 @@
 
 import { useState, useEffect } from 'react'
 import { Input } from "@/components/ui/input"
-import { PlusIcon, SearchIcon } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { SearchIcon } from "lucide-react"
 import Link from 'next/link'
 import { Card, CardContent } from "@/components/ui/card"
 import { CreateProjectDialog } from './CreateProjectDialog'
 import { useToast } from "@/hooks/use-toast"
-
-interface Project {
-    id: string
-    name: string
-    description: string | null
-    status: string
-    createdAt: string
-    updatedAt: string
-}
+import { Project } from '@prisma/client'
 
 export default function DashboardContent() {
     const [projects, setProjects] = useState<Project[]>([])
@@ -25,6 +16,7 @@ export default function DashboardContent() {
 
     useEffect(() => {
         fetchProjects()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     const fetchProjects = async () => {
