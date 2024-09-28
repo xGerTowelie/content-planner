@@ -202,7 +202,84 @@ export default function ProjectDisplay({ projectId }: { projectId: string }) {
                         </Tabs>
                     </CardContent>
                 </Card>
-                {/* ... (rest of the component remains the same) ... */}
+                <div className="space-y-6">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Project Progress</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <Progress value={progress} className="w-full mb-2" />
+                            <p className="text-center">{progress.toFixed(0)}% Complete</p>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Quick Stats</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-2">
+                                <div className="flex justify-between items-center">
+                                    <span className="flex items-center">
+                                        <CheckCircleIcon className="mr-2 h-4 w-4 text-green-500" />
+                                        Completed Steps
+                                    </span>
+                                    <span>{completedSteps} / {project.steps.length}</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="flex items-center">
+                                        <ClockIcon className="mr-2 h-4 w-4 text-blue-500" />
+                                        In Progress
+                                    </span>
+                                    <span>{project.steps.filter(step => step.status === 'in-progress').length}</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="flex items-center">
+                                        <CalendarIcon className="mr-2 h-4 w-4 text-gray-500" />
+                                        Upcoming
+                                    </span>
+                                    <span>{project.steps.filter(step => step.status === 'upcoming').length}</span>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Project Details</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="space-y-2">
+                                <div className="flex justify-between items-center">
+                                    <span className="flex items-center">
+                                        <FileIcon className="mr-2 h-4 w-4" />
+                                        Description
+                                    </span>
+                                </div>
+                                <p className="text-sm text-gray-600">{project.description || 'No description provided'}</p>
+                                <div className="flex justify-between items-center">
+                                    <span className="flex items-center">
+                                        <CalendarIcon className="mr-2 h-4 w-4" />
+                                        Created
+                                    </span>
+                                    <span className="text-sm text-gray-500">{new Date(project.createdAt).toLocaleDateString()}</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="flex items-center">
+                                        <ClockIcon className="mr-2 h-4 w-4" />
+                                        Last Updated
+                                    </span>
+                                    <span className="text-sm text-gray-500">{new Date(project.updatedAt).toLocaleDateString()}</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="flex items-center">
+                                        <UsersIcon className="mr-2 h-4 w-4" />
+                                        Status
+                                    </span>
+                                    <span className="text-sm font-medium text-green-600 capitalize">{project.status}</span>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
             </div>
             <Dialog open={isNewStepDialogOpen} onOpenChange={setIsNewStepDialogOpen}>
                 <DialogContent>
