@@ -33,14 +33,14 @@ export default function AuthLayout({
             </div>
 
             {/* Main content area */}
-            <div className="flex flex-1 overflow-hidden">
+            <div className="flex flex-1 lg:overflow-hidden">
                 {/* Sidebar for large devices */}
                 <div className="hidden lg:block">
                     <Sidebar />
                 </div>
 
                 {/* Main content */}
-                <main className="flex-1 p-6 overflow-hidden">
+                <main className="flex-1 p-6 lg:overflow-hidden">
                     <div className="h-full lg:hidden">
                         {children}
                     </div>
