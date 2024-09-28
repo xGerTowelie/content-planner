@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -9,27 +9,121 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ArrowLeft, Video, Mic, FileText, Link as LinkIcon, Plus, Trash2, Copy } from "lucide-react"
 import Link from "next/link"
-import { toast } from "@/hooks/use-toast"
+import { useToast } from "@/hooks/use-toast"
+import { SaveButton } from "./SaveButton"
 
-export default function StepsDisplay({ stepId }: { stepId: string }) {
-    const [stepName, setStepName] = useState("Write Script")
-    const [status, setStatus] = useState("draft")
-    const [resources, setResources] = useState<{ name: string; url: string }[]>([])
+interface Resource {
+    id?: string
+    name: string
+    url: string
+}
+
+interface Step {
+    id: string
+    title: string
+    videoContent: string | null
+    audioContent: string | null
+    scriptContent: string | null
+    status: string
+    resources: Resource[]
+}
+
+export default function StepsDisplay({ stepId, projectId }: { stepId: string; projectId: string }) {
+    const [step, setStep] = useState<Step | null>(null)
+    const [isLoading, setIsLoading] = useState(true)
     const [newResourceName, setNewResourceName] = useState("")
     const [newResourceUrl, setNewResourceUrl] = useState("")
+    const [isDirty, setIsDirty] = useState(false)
+    const { toast } = useToast()
 
-    console.log('view steps for id:', stepId)
+    useEffect(() => {
+        fetchStep()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [stepId, projectId])
+
+    const fetchStep = async () => {
+        try {
+            const response = await fetch(`/api/projects/${projectId}/steps/${stepId}`)
+            if (!response.ok) {
+                throw new Error('Failed to fetch step')
+            }
+            const data = await response.json()
+            setStep(data)
+        } catch (error) {
+            console.error('Error fetching step:', error)
+            toast({
+                title: "Error",
+                description: "Failed to load step. Please try again.",
+                variant: "destructive",
+            })
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    const updateStepField = (field: keyof Step, value: string) => {
+        if (step) {
+            setStep({ ...step, [field]: value })
+            setIsDirty(true)
+        }
+    }
+
+    const saveStep = async () => {
+        if (!step) return
+
+        try {
+            const response = await fetch(`/api/projects/${projectId}/steps/${stepId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    ...step,
+                    resources: step.resources.map(({ id, name, url }) => ({ id, name, url }))
+                }),
+            })
+            if (!response.ok) {
+                throw new Error('Failed to update step')
+            }
+            const updatedStep = await response.json()
+            setStep(updatedStep)
+            setIsDirty(false)
+            toast({
+                title: "Success",
+                description: "Step updated successfully",
+            })
+        } catch (error) {
+            console.error('Error updating step:', error)
+            toast({
+                title: "Error",
+                description: "Failed to update step. Please try again.",
+                variant: "destructive",
+            })
+        }
+    }
 
     const addResource = () => {
-        if (newResourceName && newResourceUrl) {
-            setResources([...resources, { name: newResourceName, url: newResourceUrl }])
+        if (newResourceName && newResourceUrl && step) {
+            const newResource: Resource = { name: newResourceName, url: newResourceUrl }
+            setStep({
+                ...step,
+                resources: [...step.resources, newResource]
+            })
             setNewResourceName("")
             setNewResourceUrl("")
+            setIsDirty(true)
         }
     }
 
     const removeResource = (index: number) => {
-        setResources(resources.filter((_, i) => i !== index))
+        if (step) {
+            const newResources = step.resources.filter((_, i) => i !== index)
+            setStep({
+                ...step,
+                resources: newResources
+            })
+            setIsDirty(true)
+        }
     }
 
     const copyToClipboard = (text: string) => {
@@ -41,32 +135,44 @@ export default function StepsDisplay({ stepId }: { stepId: string }) {
         })
     }
 
+    if (isLoading) {
+        return <div>Loading...</div>
+    }
+
+    if (!step) {
+        return <div>Step not found</div>
+    }
+
     return (
         <div className="container mx-auto p-4">
-            <div className="mb-4">
-                <Link href="/dashboard/projects/1">
+            <div className="mb-4 flex justify-between items-center">
+                <Link href={`/dashboard/projects/${projectId}`}>
                     <Button variant="ghost">
                         <ArrowLeft className="mr-2 h-4 w-4" />
                         Back to Project
                     </Button>
                 </Link>
+                <SaveButton onSave={saveStep} isDirty={isDirty} />
             </div>
             <div className="flex justify-between items-center mb-6">
                 <input
-                    value={stepName}
-                    onChange={(e) => setStepName(e.target.value)}
+                    value={step.title}
+                    onChange={(e) => updateStepField('title', e.target.value)}
                     className="text-3xl font-bold w-1/2 focus:outline-none"
                 />
                 <div className="flex items-center space-x-2">
                     <Label htmlFor="status">Status:</Label>
-                    <Select value={status} onValueChange={setStatus}>
+                    <Select
+                        value={step.status}
+                        onValueChange={(value) => updateStepField('status', value)}
+                    >
                         <SelectTrigger id="status" className="w-[180px]">
                             <SelectValue placeholder="Select status" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="draft">Draft</SelectItem>
+                            <SelectItem value="upcoming">Upcoming</SelectItem>
                             <SelectItem value="in-progress">In Progress</SelectItem>
-                            <SelectItem value="complete">Complete</SelectItem>
+                            <SelectItem value="completed">Completed</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
@@ -99,6 +205,8 @@ export default function StepsDisplay({ stepId }: { stepId: string }) {
                                         <textarea
                                             className="w-full h-32 p-2 border rounded"
                                             placeholder="Enter your video ideas here..."
+                                            value={step.videoContent || ''}
+                                            onChange={(e) => updateStepField('videoContent', e.target.value)}
                                         ></textarea>
                                     </div>
                                 </TabsContent>
@@ -108,6 +216,8 @@ export default function StepsDisplay({ stepId }: { stepId: string }) {
                                         <textarea
                                             className="w-full h-32 p-2 border rounded"
                                             placeholder="Enter your audio ideas here..."
+                                            value={step.audioContent || ''}
+                                            onChange={(e) => updateStepField('audioContent', e.target.value)}
                                         ></textarea>
                                     </div>
                                 </TabsContent>
@@ -117,6 +227,8 @@ export default function StepsDisplay({ stepId }: { stepId: string }) {
                                         <textarea
                                             className="w-full h-64 p-2 border rounded"
                                             placeholder="Write your script here..."
+                                            value={step.scriptContent || ''}
+                                            onChange={(e) => updateStepField('scriptContent', e.target.value)}
                                         ></textarea>
                                     </div>
                                 </TabsContent>
@@ -147,7 +259,7 @@ export default function StepsDisplay({ stepId }: { stepId: string }) {
                                         Add Resource
                                     </Button>
                                 </div>
-                                {resources.map((resource, index) => (
+                                {step.resources.map((resource, index) => (
                                     <div key={index} className="flex items-center justify-between bg-gray-100 p-2 rounded">
                                         <div className="flex items-center">
                                             <Button

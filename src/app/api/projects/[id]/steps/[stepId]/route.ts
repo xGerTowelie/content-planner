@@ -5,7 +5,7 @@ import { authOptions } from '@/lib/auth'
 
 export async function GET(
     _: Request,
-    { params }: { params: { projectId: string; stepId: string } }
+    { params }: { params: { id: string; stepId: string } }
 ) {
     const session = await getServerSession(authOptions)
 
@@ -15,7 +15,7 @@ export async function GET(
 
     try {
         const project = await prisma.project.findUnique({
-            where: { id: params.projectId },
+            where: { id: params.id },
         })
 
         if (!project || project.userId !== session.user.id) {
@@ -24,9 +24,10 @@ export async function GET(
 
         const step = await prisma.step.findUnique({
             where: { id: params.stepId },
+            include: { resources: true },
         })
 
-        if (!step || step.projectId !== params.projectId) {
+        if (!step || step.projectId !== params.id) {
             return NextResponse.json({ error: 'Step not found' }, { status: 404 })
         }
 
@@ -39,7 +40,7 @@ export async function GET(
 
 export async function PUT(
     request: Request,
-    { params }: { params: { projectId: string; stepId: string } }
+    { params }: { params: { id: string; stepId: string } }
 ) {
     const session = await getServerSession(authOptions)
 
@@ -48,10 +49,10 @@ export async function PUT(
     }
 
     try {
-        const { title, description, status } = await request.json()
+        const { title, videoContent, audioContent, scriptContent, status, resources } = await request.json()
 
         const project = await prisma.project.findUnique({
-            where: { id: params.projectId },
+            where: { id: params.id },
         })
 
         if (!project || project.userId !== session.user.id) {
@@ -62,13 +63,27 @@ export async function PUT(
             where: { id: params.stepId },
         })
 
-        if (!step || step.projectId !== params.projectId) {
+        if (!step || step.projectId !== params.id) {
             return NextResponse.json({ error: 'Step not found' }, { status: 404 })
         }
 
+        // Remove the stepId from resources before creating
+        const resourcesWithoutStepId = resources.map(({ id, name, url }: { id: string, name: string, url: string }) => ({ id, name, url }))
+
         const updatedStep = await prisma.step.update({
             where: { id: params.stepId },
-            data: { title, description, status },
+            data: {
+                title,
+                videoContent,
+                audioContent,
+                scriptContent,
+                status,
+                resources: {
+                    deleteMany: {},
+                    create: resourcesWithoutStepId,
+                },
+            },
+            include: { resources: true },
         })
 
         return NextResponse.json(updatedStep)
@@ -80,7 +95,7 @@ export async function PUT(
 
 export async function DELETE(
     _: Request,
-    { params }: { params: { projectId: string; stepId: string } }
+    { params }: { params: { id: string; stepId: string } }
 ) {
     const session = await getServerSession(authOptions)
 
@@ -90,7 +105,7 @@ export async function DELETE(
 
     try {
         const project = await prisma.project.findUnique({
-            where: { id: params.projectId },
+            where: { id: params.id },
         })
 
         if (!project || project.userId !== session.user.id) {
@@ -101,7 +116,7 @@ export async function DELETE(
             where: { id: params.stepId },
         })
 
-        if (!step || step.projectId !== params.projectId) {
+        if (!step || step.projectId !== params.id) {
             return NextResponse.json({ error: 'Step not found' }, { status: 404 })
         }
 

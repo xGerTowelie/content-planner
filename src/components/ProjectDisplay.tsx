@@ -5,20 +5,15 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { CalendarIcon, CheckCircleIcon, ClockIcon, FileIcon, PlusIcon, UsersIcon } from "lucide-react"
+import { CalendarIcon, CheckCircleIcon, ClockIcon, FileIcon, PickaxeIcon, PlusIcon, SquarePenIcon, UsersIcon } from "lucide-react"
 import Link from 'next/link'
 import { useToast } from "@/hooks/use-toast"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Step } from '@prisma/client'
 
-interface Step {
-    id: string
-    title: string
-    description: string | null
-    status: string
-}
 
 interface Project {
     id: string
@@ -151,9 +146,7 @@ export default function ProjectDisplay({ projectId }: { projectId: string }) {
                                     {project.steps.map((step) => (
                                         <li key={step.id} className="flex items-center justify-between p-2 bg-white rounded shadow">
                                             <Link href={`/dashboard/projects/${projectId}/steps/${step.id}`} className="flex items-center">
-                                                <CheckCircleIcon className={`mr-2 h-4 w-4 ${step.status === 'completed' ? 'text-green-500' :
-                                                    step.status === 'in-progress' ? 'text-blue-500' : 'text-gray-300'
-                                                    }`} />
+                                                <StepStatus status={step.status} />
                                                 {step.title}
                                             </Link>
                                             <span className="text-sm text-gray-500 capitalize">{step.status}</span>
@@ -333,4 +326,13 @@ export default function ProjectDisplay({ projectId }: { projectId: string }) {
             </Dialog>
         </div>
     )
+}
+
+function StepStatus({ status }: { status: string }) {
+    switch (status) {
+        case "completed": return <CheckCircleIcon className="mr-2 h-4 w-4 text-green-500" />
+        case "in-progress": return <PickaxeIcon className="mr-2 h-4 w-4 text-blue-500" />
+        case "upcoming": return <SquarePenIcon className="mr-2 h-4 w-4 text-grey-300" />
+        default: return null
+    }
 }
