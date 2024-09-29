@@ -11,6 +11,7 @@ import { ArrowLeft, Video, Mic, FileText, Link as LinkIcon, Plus, Trash2, Copy }
 import Link from "next/link"
 import { useToast } from "@/hooks/use-toast"
 import { SaveButton } from "./SaveButton"
+import { useRouter } from "next/navigation"
 
 interface Resource {
     id?: string
@@ -35,6 +36,7 @@ export default function StepsDisplay({ stepId, projectId }: { stepId: string; pr
     const [newResourceUrl, setNewResourceUrl] = useState("")
     const [isDirty, setIsDirty] = useState(false)
     const { toast } = useToast()
+    const router = useRouter()
 
     useEffect(() => {
         fetchStep()
@@ -85,13 +87,16 @@ export default function StepsDisplay({ stepId, projectId }: { stepId: string; pr
             if (!response.ok) {
                 throw new Error('Failed to update step')
             }
-            const updatedStep = await response.json()
+            const updatedStep: Step = await response.json()
             setStep(updatedStep)
             setIsDirty(false)
             toast({
                 title: "Success",
                 description: "Step updated successfully",
             })
+            if (updatedStep.status === "completed") {
+                router.push(`/dashboard/projects/${projectId}`)
+            }
         } catch (error) {
             console.error('Error updating step:', error)
             toast({
