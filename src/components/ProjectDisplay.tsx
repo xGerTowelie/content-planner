@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { CalendarIcon, CheckCircleIcon, ClockIcon, FileIcon, PickaxeIcon, PlusIcon, SquarePenIcon, UsersIcon } from "lucide-react"
+import { CalendarIcon, CheckCircleIcon, ClockIcon, FileIcon, LightbulbIcon, ListTodoIcon, PickaxeIcon, PlusIcon, SquarePenIcon, UsersIcon, WorkflowIcon } from "lucide-react"
 import Link from 'next/link'
 import { useToast } from "@/hooks/use-toast"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
@@ -126,7 +126,7 @@ export default function ProjectDisplay({ projectId }: { projectId: string }) {
             </header>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <Card className="md:col-span-2">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
                         <CardTitle>Project Steps</CardTitle>
                         <Button size="sm" onClick={() => setIsNewStepDialogOpen(true)}>
                             <PlusIcon className="mr-2 h-4 w-4" />
@@ -134,12 +134,24 @@ export default function ProjectDisplay({ projectId }: { projectId: string }) {
                         </Button>
                     </CardHeader>
                     <CardContent>
-                        <Tabs defaultValue="all" className="w-full">
-                            <TabsList>
-                                <TabsTrigger value="all">All Steps</TabsTrigger>
-                                <TabsTrigger value="completed">Completed</TabsTrigger>
-                                <TabsTrigger value="in-progress">In Progress</TabsTrigger>
-                                <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
+                        <Tabs defaultValue="all" className="w-full" >
+                            <TabsList className="w-full flex">
+                                <TabsTrigger value="all" className="w-full">
+                                    <span className="hidden lg:block">All Steps</span>
+                                    <span className="lg:hidden">All</span>
+                                </TabsTrigger>
+                                <TabsTrigger value="completed" className="w-full">
+                                    <span className="hidden lg:block">Completed</span>
+                                    <span className="lg:hidden"><StepStatus status="completed" /></span>
+                                </TabsTrigger>
+                                <TabsTrigger value="in-progress" className="w-full">
+                                    <span className="hidden lg:block">In Progress</span>
+                                    <span className="lg:hidden"><StepStatus status="in-progress" /></span>
+                                </TabsTrigger>
+                                <TabsTrigger value="upcoming" className="w-full">
+                                    <span className="hidden lg:block">Upcoming</span>
+                                    <span className="lg:hidden"><StepStatus status="upcoming" /></span>
+                                </TabsTrigger>
                             </TabsList>
                             <TabsContent value="all">
                                 <ul className="space-y-2">
@@ -331,8 +343,8 @@ export default function ProjectDisplay({ projectId }: { projectId: string }) {
 function StepStatus({ status }: { status: string }) {
     switch (status) {
         case "completed": return <CheckCircleIcon className="mr-2 h-4 w-4 text-green-500" />
-        case "in-progress": return <PickaxeIcon className="mr-2 h-4 w-4 text-blue-500" />
-        case "upcoming": return <SquarePenIcon className="mr-2 h-4 w-4 text-grey-300" />
+        case "in-progress": return <ListTodoIcon className="mr-2 h-4 w-4 text-blue-500" />
+        case "upcoming": return <WorkflowIcon className="mr-2 h-4 w-4 text-grey-300" />
         default: return null
     }
 }
