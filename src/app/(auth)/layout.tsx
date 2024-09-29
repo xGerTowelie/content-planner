@@ -41,7 +41,7 @@ export default function AuthLayout({
                 </div>
 
                 {/* Main content */}
-                <main className="flex-1 p-6 lg:overflow-hidden">
+                <main className="flex-1 p-6 overflow-x-hidden overflow-y-scroll lg:overflow-y-hidden">
                     <div className="h-full lg:hidden">
                         {children}
                     </div>
