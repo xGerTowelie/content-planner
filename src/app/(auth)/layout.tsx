@@ -28,7 +28,7 @@ export default function AuthLayout({
                         </Button>
                     </SheetTrigger>
                     <SheetContent side="left" className="p-0">
-                        <Sidebar />
+                        <Sidebar onNavigation={() => setIsSidebarOpen(false)} />
                     </SheetContent>
                 </Sheet>
             </div>

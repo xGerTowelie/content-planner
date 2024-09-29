@@ -10,10 +10,10 @@ export async function GET() {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-
     try {
         const projects = await prisma.project.findMany({
             where: { userId: session.user.id },
+            orderBy: { updatedAt: 'asc' },
             include: { steps: true },
         })
 
