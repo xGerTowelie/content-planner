@@ -157,11 +157,13 @@ export default function ProjectDisplay({ projectId }: { projectId: string }) {
                                 <ul className="space-y-2">
                                     {project.steps.map((step) => (
                                         <li key={step.id} className="flex items-center justify-between p-2 bg-white rounded shadow">
-                                            <Link href={`/dashboard/projects/${projectId}/steps/${step.id}`} className="flex items-center">
-                                                <StepStatus status={step.status} />
-                                                {step.title}
+                                            <Link
+                                                href={`/dashboard/projects/${projectId}/steps/${step.id}`}
+                                                className="flex flex-row gap-3 w-full">
+                                                <span className="pt-1 text-center"><StepStatus status={step.status} /></span>
+                                                <h1 className="flex-grow">{step.title}</h1>
+                                                <span className="text-sm text-gray-500 capitalize">{step.status}</span>
                                             </Link>
-                                            <span className="text-sm text-gray-500 capitalize">{step.status}</span>
                                         </li>
                                     ))}
                                 </ul>
