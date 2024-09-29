@@ -138,7 +138,7 @@ export default function DashboardContent() {
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {paginatedProjects.map((project) => (
                                 <Link key={project.id} href={`/dashboard/projects/${project.id}`}>
-                                    <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+                                    <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer">
                                         <CardContent className="p-6 flex flex-col h-full ">
                                             <div className="flex justify-between items-start">
                                                 <h3 className="text-xl font-semibold mb-2">{project.name}</h3>
