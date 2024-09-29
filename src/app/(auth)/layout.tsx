@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Menu } from "lucide-react"
+import Link from "next/link"
 
 export default function AuthLayout({
     children,
@@ -18,7 +19,7 @@ export default function AuthLayout({
         <div className="flex flex-col h-screen bg-gray-100">
             {/* Top bar for small devices */}
             <div className="lg:hidden flex items-center justify-between p-4 bg-white shadow-md">
-                <h1 className="text-2xl font-bold">VidManager</h1>
+                <Link href="/" className="text-2xl font-bold">VidManager</Link>
                 <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
                     <SheetTrigger asChild>
                         <Button variant="ghost" size="icon">

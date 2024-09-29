@@ -117,7 +117,7 @@ export default function ProjectDisplay({ projectId }: { projectId: string }) {
     const progress = (completedSteps / project.steps.length) * 100
 
     return (
-        <div className="space-y-6">
+        <div className="md:p-4 space-y-6">
             <header className="flex justify-between items-center">
                 <h1 className="text-3xl font-bold">{project.name}</h1>
                 <Link href="/dashboard">

@@ -6,7 +6,7 @@ import SignOutButton from './SignOutButton'
 export default function Sidebar() {
     return (
         <aside className="w-64 bg-white p-6 h-full flex flex-col">
-            <h1 className="text-2xl font-bold mb-8 lg:block hidden">VidManager</h1>
+            <Link className="text-2xl font-bold mb-8 lg:block hidden" href="/">VidManager</Link>
             <nav className="flex-1">
                 {[
                     { icon: HomeIcon, label: "Dashboard", href: "/dashboard" },

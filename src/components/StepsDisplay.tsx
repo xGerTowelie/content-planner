@@ -145,7 +145,7 @@ export default function StepsDisplay({ stepId, projectId }: { stepId: string; pr
 
     return (
         <div className="container mx-auto p-4">
-            <div className="mb-4 flex justify-between items-center">
+            <div className="mb-10 flex justify-between items-center">
                 <Link href={`/dashboard/projects/${projectId}`}>
                     <Button variant="ghost">
                         <ArrowLeft className="mr-2 h-4 w-4" />
@@ -154,11 +154,11 @@ export default function StepsDisplay({ stepId, projectId }: { stepId: string; pr
                 </Link>
                 <SaveButton onSave={saveStep} isDirty={isDirty} />
             </div>
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex flex-col md:flex-row justify-between items-start gap-4 md:items-center mb-10">
                 <input
                     value={step.title}
                     onChange={(e) => updateStepField('title', e.target.value)}
-                    className="text-3xl font-bold w-1/2 focus:outline-none"
+                    className="text-3xl bg-transparent border-b-2 pb-2 font-bold w-full lg:mr-6 focus:outline-none"
                 />
                 <div className="flex items-center space-x-2">
                     <Label htmlFor="status">Status:</Label>
