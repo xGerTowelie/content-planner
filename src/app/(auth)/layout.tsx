@@ -44,7 +44,7 @@ export default function AuthLayout({
                     <div className="h-full lg:hidden">
                         {children}
                     </div>
-                    <Card className="hidden lg:block h-full">
+                    <Card className="p-4 hidden lg:block h-full">
                         {children}
                     </Card>
                 </main>
